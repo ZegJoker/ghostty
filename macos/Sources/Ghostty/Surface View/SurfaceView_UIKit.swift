@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 import GhosttyKit
 
 extension Ghostty {
@@ -23,6 +24,7 @@ extension Ghostty {
             // is non-zero so that our layer bounds are non-zero so that our renderer
             // can do SOMETHING.
             super.init(id: uuid, frame: CGRect(x: 0, y: 0, width: 800, height: 600))
+            self.contentScaleFactor = UIScreen.main.scale
 
             // Setup our surface. This will also initialize all the terminal IO.
             let surface_cfg = baseConfig ?? SurfaceConfiguration()
@@ -69,16 +71,31 @@ extension Ghostty {
                 UInt32(size.width * scale),
                 UInt32(size.height * scale)
             )
+            ghostty_surface_refresh(surface)
+            ghostty_surface_draw(surface)
         }
 
         // MARK: UIView
 
+        // Use default CALayer; Ghostty adds its own IOSurfaceLayer sublayer.
         override class var layerClass: AnyClass {
-            return CAMetalLayer.self
+            CALayer.self
         }
 
         override func didMoveToWindow() {
             sizeDidChange(frame.size)
+        }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            // Update sublayer frames to match view bounds
+            if let sublayers = layer.sublayers {
+                for sublayer in sublayers {
+                    sublayer.frame = bounds
+                    sublayer.contentsScale = contentScaleFactor
+                }
+            }
+            sizeDidChange(bounds.size)
         }
     }
 }

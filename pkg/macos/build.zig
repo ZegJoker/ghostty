@@ -34,6 +34,8 @@ pub fn build(b: *std.Build) !void {
     lib.linkFramework("CoreVideo");
     lib.linkFramework("QuartzCore");
     lib.linkFramework("IOSurface");
+    lib.linkFramework("Metal");
+    lib.linkFramework("MetalKit");
     if (target.result.os.tag == .macos) {
         lib.linkFramework("Carbon");
         module.linkFramework("Carbon", .{});
@@ -46,6 +48,8 @@ pub fn build(b: *std.Build) !void {
         module.linkFramework("CoreVideo", .{});
         module.linkFramework("QuartzCore", .{});
         module.linkFramework("IOSurface", .{});
+        module.linkFramework("Metal", .{});
+        module.linkFramework("MetalKit", .{});
 
         try apple_sdk.addPaths(b, lib);
     }
